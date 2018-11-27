@@ -4,6 +4,9 @@ public class EnveloppeConvexe {
 
     List<Point> points ;
     List<Point> enveloppeConvexe;
+    private int fail =0;
+    Point pointHautGauche;
+    Point pointHautDroit;
 
     public EnveloppeConvexe(List<Point> points) {
         this.points = new ArrayList<>(points);
@@ -15,33 +18,75 @@ public class EnveloppeConvexe {
 
         if (tailleEnsemble < 3) {
             //gérer les cas particuliers
-        }
-        else {
+            for (Point point : points) {
+                enveloppeConvexe.add(point);
+            }
+        } else {
 
-            // vers le haut 1 fois
+            //Les deux enveloppe à fusionner
             List<Point> enveloppe1 = buildEnveloppeConvexe(debut, tailleEnsemble / 2);
             List<Point> enveloppe2 = buildEnveloppeConvexe((tailleEnsemble / 2) + 1, fin);
-            Point pointGauche = points.get(tailleEnsemble/2);
-            Point pointDroit = points.get((tailleEnsemble/2) +1);
-            Vecteur vecteurInitial = new Vecteur(pointDroit,pointGauche);
-            int indexGauche = findPointInEnveloppe(enveloppe1, pointGauche);
-            int indexpred = 0;
-            if(indexGauche ==0) indexpred = enveloppe1.size()-1;
-            else indexpred=indexGauche-1;
-            Vecteur vecteurTest = new Vecteur(pointDroit,enveloppe1.get(indexpred));
-            double produitVec = vecteurInitial.calculProduitVec(vecteurTest);
-            if(produitVec<0) pointGauche = vecteurTest.point2;
-            else {
-                int indexDroit = findPointInEnveloppe(enveloppe2, pointDroit);
-                int indexsucc = 0;
-                if(indexDroit == enveloppe1.size()) indexsucc = enveloppe1.size()+1;
-                else indexsucc=indexGauche+1;
-                pointGauche = enveloppe2.get(indexsucc);
+            //Les deux points du vecteur initial
+            pointHautGauche = points.get(tailleEnsemble / 2);
+            pointHautDroit = points.get((tailleEnsemble / 2) + 1);
+            //on arrete de monter quand il y a deux fail
+            while (fail < 2) {
+                //monter à droite jusqu'à fail
+                monterDroit(enveloppe1, enveloppe2);
+                //monter à gauche jusqu'à fail
+                monterGauche(enveloppe1, enveloppe2);
             }
-
-            //To-do : boucle jusqu'à fail deux fois, la même chose pour l'arête du bas, la fusion des enveloppes
+            //TODO : boucle jusqu'à fail deux fois, la même chose pour l'arête du bas, la fusion des enveloppes
         }
-        return points;
+        return null;
+    }
+
+    private void monterDroit(List<Point> enveloppe1, List<Point> enveloppe2) {
+        Vecteur vecteurInitial = new Vecteur(pointHautGauche, pointHautDroit);
+        int indexDroit = findPointInEnveloppe(enveloppe2, pointHautDroit);
+        int indexsucc;
+        if(indexDroit == enveloppe2.size()-1) indexsucc = 0;
+        else indexsucc=indexDroit+1;
+        Vecteur vecteurTest = new Vecteur(pointHautGauche,enveloppe2.get(indexsucc));
+        double produitVec = vecteurInitial.calculProduitVec(vecteurTest);
+        if(produitVec>0) {
+            fail = 0;
+            pointHautDroit = vecteurTest.point2;
+            monterDroit(enveloppe1,enveloppe2);
+        }
+        else{
+            int indexGauche = findPointInEnveloppe(enveloppe1, pointHautGauche);
+            int indexpred = 0;
+            if (indexGauche == 0) indexpred = enveloppe2.size() -1;
+            else indexpred = indexGauche - 1;
+            pointHautGauche = enveloppe2.get(indexpred);
+            fail = 1;
+            return;
+        }
+    }
+
+    private void monterGauche(List<Point> enveloppe1, List<Point> enveloppe2) {
+        Vecteur vecteurInitial = new Vecteur(pointHautDroit, pointHautGauche);
+        int indexGauche = findPointInEnveloppe(enveloppe1, pointHautGauche);
+        int indexpred = 0;
+        if(indexGauche ==0) indexpred = enveloppe1.size()-1;
+        else indexpred=indexGauche-1;
+        Vecteur vecteurTest = new Vecteur(pointHautDroit,enveloppe1.get(indexpred));
+        double produitVec = vecteurInitial.calculProduitVec(vecteurTest);
+        if(produitVec<0) {
+            fail = 0;
+            pointHautGauche = vecteurTest.point2;
+            monterDroit(enveloppe1,enveloppe2);
+        }
+        else{
+            int indexDroit = findPointInEnveloppe(enveloppe2, pointHautDroit);
+            int indexsucc = 0;
+            if (indexDroit == enveloppe1.size()) indexsucc = 0;
+            else indexsucc = indexGauche + 1;
+            pointHautGauche = enveloppe2.get(indexsucc);
+            fail = 1;
+            return;
+        }
     }
 
     public int findPointInEnveloppe(List<Point> enveloppe, Point pointToFind) {
