@@ -22,7 +22,7 @@ public class Interface extends Application {
         }
 
         public List<Point> randomPoints() {
-        int nbSommets = ThreadLocalRandom.current().nextInt(3, 10);
+        int nbSommets = ThreadLocalRandom.current().nextInt(3, 20);
         List<Point> points = new ArrayList<>(nbSommets);
         for(int i = 0 ; i < nbSommets ; ++i) {
             int x = ThreadLocalRandom.current().nextInt(100, 800);
