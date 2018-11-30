@@ -21,13 +21,24 @@ public class Interface extends Application {
             launch(args);
         }
 
+        public List<Point> randomPoints() {
+        int nbSommets = ThreadLocalRandom.current().nextInt(3, 10);
+        List<Point> points = new ArrayList<>(nbSommets);
+        for(int i = 0 ; i < nbSommets ; ++i) {
+            int x = ThreadLocalRandom.current().nextInt(100, 800);
+            int y = ThreadLocalRandom.current().nextInt(100, 800);
+            points.add(new Point(x,y));
+        }
+        return points;
+        }
+
         @Override
         public void start(Stage primaryStage) {
             Group root = new Group();
             Canvas canvas = new Canvas(1000, 1000);
             GraphicsContext graphicsContext = canvas.getGraphicsContext2D();
             List<Point2D> points = new ArrayList<>();
-            Point p1 = new Point(100,200);
+            /*Point p1 = new Point(100,200);
             Point p2 = new Point(600,400);
             Point p3 = new Point(800,600);
             Point p4 = new Point(400,100);
@@ -42,15 +53,19 @@ public class Interface extends Application {
             pointsE.add(p5);
             pointsE.add(p6);
             pointsE.add(p7);
-
+            */
+            List<Point> pointsE = randomPoints();
             EnveloppeConvexe env = new EnveloppeConvexe(pointsE);
-            points.add(new Point2D(p1.x, p1.y));
+            for (Point point: pointsE) {
+                points.add(new Point2D(point.x,point.y));
+            }
+            /*points.add(new Point2D(p1.x, p1.y));
             points.add(new Point2D(p2.x, p2.y));
             points.add(new Point2D(p3.x, p3.y));
             points.add(new Point2D(p4.x, p4.y));
             points.add(new Point2D(p5.x, p5.y));
             points.add(new Point2D(p6.x, p6.y));
-            points.add(new Point2D(p7.x, p7.y));
+            points.add(new Point2D(p7.x, p7.y));*/
             for (Point2D point:  points) {
                 graphicsContext.strokeOval(point.getX(),point.getY(),5.0,5.0);
             }
