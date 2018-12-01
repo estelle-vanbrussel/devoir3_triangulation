@@ -1,13 +1,10 @@
 import javafx.application.Application;
 
-import javafx.application.Application;
 import javafx.geometry.Point2D;
 import javafx.scene.Group;
 import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
-import javafx.scene.paint.Color;
-import javafx.scene.paint.Paint;
 import javafx.stage.Stage;
 
 import java.util.ArrayList;
@@ -38,36 +35,40 @@ public class Interface extends Application {
             Canvas canvas = new Canvas(1000, 1000);
             GraphicsContext graphicsContext = canvas.getGraphicsContext2D();
             List<Point2D> points = new ArrayList<>();
-            /*Point p1 = new Point(300,300);
+            Point p1 = new Point(300,300);
             Point p2 = new Point(500,600);
             Point p3 = new Point(200,900);
-            Point p4 = new Point(900,400);
+            /*Point p4 = new Point(900,400);
             Point p5 = new Point(950,800);
             Point p6 = new Point(600,800);
-            Point p7 = new Point(100,100);
+            Point p7 = new Point(100,100);*/
+
+            /*Point p1 = new Point(500,500);
+            Point p2 = new Point(470,560);
+            Point p3 = new Point(430,490);
+            Point p4 = new Point(520,590);
+            Point p5 = new Point(550,450);
+            Point p6 = new Point(480,580);
+            Point p7 = new Point(420,510);*/
+
             List<Point> pointsE = new ArrayList<>();
             pointsE.add(p1);
             pointsE.add(p2);
             pointsE.add(p3);
-            pointsE.add(p4);
+           /* pointsE.add(p4);
             pointsE.add(p5);
             pointsE.add(p6);
             pointsE.add(p7);*/
 
-            List<Point> pointsE = randomPoints();
+            //List<Point> pointsE = randomPoints();
             EnveloppeConvexe env = new EnveloppeConvexe(pointsE);
-            for (Point point : env.enveloppeConvexe) {
-                System.out.println(point.x);
-                System.out.println(point.y);
-                System.out.println('\n');
-            }
             for (Point point: pointsE) {
                 points.add(new Point2D(point.x,point.y));
             }
-            /*points.add(new Point2D(p1.x, p1.y));
+            points.add(new Point2D(p1.x, p1.y));
             points.add(new Point2D(p2.x, p2.y));
             points.add(new Point2D(p3.x, p3.y));
-            points.add(new Point2D(p4.x, p4.y));
+           /* points.add(new Point2D(p4.x, p4.y));
             points.add(new Point2D(p5.x, p5.y));
             points.add(new Point2D(p6.x, p6.y));
             points.add(new Point2D(p7.x, p7.y));*/
@@ -88,6 +89,12 @@ public class Interface extends Application {
                     env.enveloppeConvexe.get(0).y + radius,
                     env.enveloppeConvexe.get(env.enveloppeConvexe.size()-1).x + radius,
                     env.enveloppeConvexe.get(env.enveloppeConvexe.size()-1).y + radius);
+            Triangle triangle = new Triangle(p1, p2, p3);
+            double radiusCircle = Math.sqrt(Math.pow(triangle.p1.x - triangle.centre.x, 2) + Math.pow(triangle.p1.y - triangle.centre.y, 2));
+            graphicsContext.strokeOval((triangle.centre.x - radiusCircle), (triangle.centre.y - radiusCircle), radiusCircle*2, radiusCircle*2);
+
+            TriangulationDelaunay triangulationDelaunay = new TriangulationDelaunay(env);
+            graphicsContext.strokeRect(triangulationDelaunay.rectangle.x, triangulationDelaunay.rectangle.y, triangulationDelaunay.rectangle.width, triangulationDelaunay.rectangle.height);
             root.getChildren().add(canvas);
             primaryStage.setScene(new Scene(root));
             primaryStage.show();
