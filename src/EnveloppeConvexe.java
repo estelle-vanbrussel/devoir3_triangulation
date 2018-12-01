@@ -19,11 +19,14 @@ public class EnveloppeConvexe {
     public List<Point> buildEnveloppeConvexe(int debut, int fin) {
         int tailleEnsemble = fin - debut + 1;
         List<Point> enveloppe = new ArrayList<>();
-        if (tailleEnsemble < 4) {
+        //pour tailleEnsemble = 3 : les 3 points ne doivent pas être ajoutés dans n'importe quel ordre :
+        //ils doivent suivre le sens des aiguilles d'une montre.
+        if (tailleEnsemble < 3) {
             //gérer les cas particuliers
             for (int i=debut; i< fin +1 ; i++) {
                 enveloppe.add(points.get(i));
             }
+
         } else {
 
             //Les deux enveloppe à fusionner
@@ -87,7 +90,7 @@ public class EnveloppeConvexe {
         else indexsucc=indexDroit+1;
         Vecteur vecteurTest = new Vecteur(pointHautGauche,enveloppe2.get(indexsucc));
         double produitVec = vecteurInitial.calculProduitVec(vecteurTest);
-        if(produitVec<0) {
+        if(produitVec > 0) {
             fail = 0;
             pointHautDroit = enveloppe2.get(indexsucc);
             monterDroit(enveloppe1,enveloppe2);
@@ -105,7 +108,7 @@ public class EnveloppeConvexe {
         else indexpred=indexGauche-1;
         Vecteur vecteurTest = new Vecteur(pointHautDroit,enveloppe1.get(indexpred));
         double produitVec = vecteurInitial.calculProduitVec(vecteurTest);
-        if(produitVec>0) {
+        if(produitVec < 0) {
             fail = 0;
             pointHautGauche = enveloppe1.get(indexpred);
             monterGauche(enveloppe1,enveloppe2);
@@ -123,7 +126,7 @@ public class EnveloppeConvexe {
         else indexpred=indexDroit-1;
         Vecteur vecteurTest = new Vecteur(pointBasGauche,enveloppe2.get(indexpred));
         double produitVec = vecteurInitial.calculProduitVec(vecteurTest);
-        if(produitVec>0) {
+        if(produitVec < 0) {
             fail = 0;
             pointBasDroit = enveloppe2.get(indexpred);
             descendreDroit(enveloppe1,enveloppe2);
@@ -141,7 +144,7 @@ public class EnveloppeConvexe {
         else indexsucc=indexGauche+1;
         Vecteur vecteurTest = new Vecteur(pointBasDroit,enveloppe1.get(indexsucc));
         double produitVec = vecteurInitial.calculProduitVec(vecteurTest);
-        if(produitVec<0) {
+        if(produitVec > 0) {
             fail = 0;
             pointBasGauche = enveloppe1.get(indexsucc);
             descendreGauche(enveloppe1,enveloppe2);
