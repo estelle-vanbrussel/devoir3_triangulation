@@ -17,6 +17,10 @@ public class Triangle {
         rayonCercleCirconscrit = Math.sqrt(Math.pow(this.p1.x - this.centre.x, 2) + Math.pow(this.p1.y - this.centre.y, 2));
     }
 
+    public boolean contientPoint(Point point) {
+        return (point == p1 || point == p2 || point == p3);
+    }
+
     public Point calculerCentre() {
         //milieu d'un premier côté du triangle
         double xMilieu1_2 = (p1.x + p2.x) / 2;

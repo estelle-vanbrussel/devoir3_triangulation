@@ -25,14 +25,14 @@ public class App {
         points.add(p7);
         EnveloppeConvexe env = new EnveloppeConvexe(points);
 
-        Triangulation triangulation = new Triangulation(env);
+        /*Triangulation triangulation = new Triangulation(env);
         for (Arete arete : triangulation.aretes) {
             System.out.println(arete.point1.x);
             System.out.println(arete.point1.y);
             System.out.println(arete.point2.x);
             System.out.println(arete.point2.y);
             System.out.println('\n');
-        }
+        }*/
     }
 
 }

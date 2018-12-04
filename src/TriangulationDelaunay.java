@@ -64,18 +64,89 @@ public class TriangulationDelaunay {
             triangles.add(new Triangle(triangle.p3, triangle.p1, point));
             triangles.remove(triangle);
             pointsUtilises.add(point);
-            for (Triangle triangle1 : triangles) {
-                Point pointDansCercle = bouleVide(triangle1);
+
+            checkTrianglesValides();
+        }
+    }
+
+    public void checkTrianglesValides() {
+        for (Triangle triangle1 : triangles) {
+            List<Point> pointsDansCercle = bouleVide(triangle1);
+            if (pointsDansCercle.size() > 1) System.out.println("azer");
+            for (Point pointDansCercle : pointsDansCercle) {
                 if (pointDansCercle != null) {
                     basculerArete(triangle1, pointDansCercle);
+                    checkTrianglesValides();
+                    return;
                 }
             }
         }
     }
 
-    public void basculerArete(Triangle triangle, Point point) {
+    public Triangle findTriangleAdjacent(Point point, Triangle triangleCourant) {
+
+        for (Triangle triangleAdjacent : triangles) {
+            if (triangleAdjacent.contientPoint(point)) {
+                int cptPoints = 0;
+                if (triangleAdjacent.contientPoint(triangleCourant.p1)) {
+                    ++cptPoints;
+                }
+                if (triangleAdjacent.contientPoint(triangleCourant.p2)) {
+                    ++cptPoints;
+                }
+                if (triangleAdjacent.contientPoint(triangleCourant.p3)) {
+                    ++cptPoints;
+                }
+                if (cptPoints == 2) {
+                    return triangleAdjacent;
+                }
+            }
+        }
+        return null;
+    }
+
+    public Point findPointDifferent(Triangle triangleAdj1, Triangle triangleAdj2) {
+        if (!triangleAdj1.contientPoint(triangleAdj2.p1)) {
+            return triangleAdj2.p1;
+        }
+        if (!triangleAdj1.contientPoint(triangleAdj2.p2)) {
+            return triangleAdj2.p2;
+        }
+        if (!triangleAdj1.contientPoint(triangleAdj2.p3)) {
+            return triangleAdj2.p3;
+        }
+        return null;
+    }
+
+    public void basculerArete(Triangle triangleCourant, Point point) {
         //suppr les triangles qui contiennent l'arête à supprimer
         //créer les 2 nouveaux triangles composés de la nouvelle arête
+        Triangle triangleAdjacent = findTriangleAdjacent(point, triangleCourant);
+        if (triangleAdjacent == null) {
+            System.out.println("Pas de triangle adjacent, pas normal");
+        }
+        Point pointDifferent = findPointDifferent(triangleAdjacent, triangleCourant);
+        if (pointDifferent == null) {
+            System.out.println("Pas de point différent, pas normal.");
+        }
+        if (pointDifferent == triangleCourant.p1) {
+            Triangle newTriangle1 = new Triangle(point, pointDifferent, triangleCourant.p2);
+            Triangle newTriangle2 = new Triangle(point, pointDifferent, triangleCourant.p3);
+            triangles.add(newTriangle1);
+            triangles.add(newTriangle2);
+        } else if (pointDifferent == triangleCourant.p2) {
+            Triangle newTriangle1 = new Triangle(point, pointDifferent, triangleCourant.p1);
+            Triangle newTriangle2 = new Triangle(point, pointDifferent, triangleCourant.p3);
+            triangles.add(newTriangle1);
+            triangles.add(newTriangle2);
+        } else if (pointDifferent == triangleCourant.p3) {
+            Triangle newTriangle1 = new Triangle(point, pointDifferent, triangleCourant.p1);
+            Triangle newTriangle2 = new Triangle(point, pointDifferent, triangleCourant.p2);
+            triangles.add(newTriangle1);
+            triangles.add(newTriangle2);
+        }
+        triangles.remove(triangleAdjacent);
+        triangles.remove(triangleCourant);
     }
 
     /**
@@ -84,13 +155,15 @@ public class TriangulationDelaunay {
      * @return le premier point trouvé à l'intérieur du cercle circonscrit du triangle
      */
     //TODO : FAUT IL RETURN UNE LISTE DE POINTS AU CAS OU LE CERCLE CONTIENT PLUSIEURS AUTRES POINTS
-    public Point bouleVide(Triangle triangle) {
+    public List<Point> bouleVide(Triangle triangle) {
+        List<Point> pointsDansCercle = new ArrayList<>();
         for (Point point : pointsUtilises) {
+            if (triangle.contientPoint(point)) continue;
             double distPointCentreCercleCirconscrit = Math.sqrt(Math.pow(point.x - triangle.centre.x, 2) + Math.pow(point.y - triangle.centre.y, 2));
             if (distPointCentreCercleCirconscrit < triangle.rayonCercleCirconscrit)
-                return point;
+                pointsDansCercle.add(point);
         }
-        return null;
+        return pointsDansCercle;
     }
 
     /**
