@@ -19,11 +19,11 @@ public class Interface extends Application {
         }
 
         public List<Point> randomPoints() {
-            int nbSommets = ThreadLocalRandom.current().nextInt(4, 5);
+            int nbSommets = ThreadLocalRandom.current().nextInt(15, 20);
             List<Point> points = new ArrayList<>(nbSommets);
             for(int i = 0 ; i < nbSommets ; ++i) {
-                int x = ThreadLocalRandom.current().nextInt(400, 600);
-                int y = ThreadLocalRandom.current().nextInt(400, 600);
+                int x = ThreadLocalRandom.current().nextInt(255, 745);
+                int y = ThreadLocalRandom.current().nextInt(255, 745);
                 points.add(new Point(x,y));
             }
             return points;
@@ -64,13 +64,13 @@ public class Interface extends Application {
 
             TriangulationDelaunay triangulationDelaunay = new TriangulationDelaunay(env);
             graphicsContext.strokeRect(triangulationDelaunay.rectangle.x, triangulationDelaunay.rectangle.y, triangulationDelaunay.rectangle.width, triangulationDelaunay.rectangle.height);
-            for (Triangle triangle : triangulationDelaunay.triangles) {
+            /*for (Triangle triangle : triangulationDelaunay.triangles) {
                 graphicsContext.strokeOval(
                         triangle.centre.x - triangle.rayonCercleCirconscrit,
                         triangle.centre.y - triangle.rayonCercleCirconscrit,
                         triangle.rayonCercleCirconscrit*2,
                         triangle.rayonCercleCirconscrit*2);
-            }
+            }*/
 
             for (Triangle triangle : triangulationDelaunay.triangles) {
                 graphicsContext.strokeLine(triangle.p1.x, triangle.p1.y, triangle.p2.x, triangle.p2.y);

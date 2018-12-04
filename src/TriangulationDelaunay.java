@@ -22,6 +22,8 @@ public class TriangulationDelaunay {
     //rectangle englobant le nuage de points
     Rectangle rectangle;
 
+    Point pointTriangleAdjacent;
+
     /**
      * Constructeur dans lequel on initialise les listes et le rectangle aux bonnes dimensions
      * @param enveloppeConvexe l'enveloppe convexe sur laquelle on se base
@@ -55,7 +57,9 @@ public class TriangulationDelaunay {
 
     //algo pour trouver la triangulation de Delaunay
     public void hermeline() {
+        int nbIterations = 0;
         while(!pointsRestants.isEmpty()) {
+            System.out.println(nbIterations);
             Point point = pointsRestants.poll();
             Triangle triangle = findTriangleContainingPoint(point);
             //on ajoute les 3 nouveaux triangles et on supprime l'ancien
@@ -63,42 +67,54 @@ public class TriangulationDelaunay {
             triangles.add(new Triangle(triangle.p2, triangle.p3, point));
             triangles.add(new Triangle(triangle.p3, triangle.p1, point));
             triangles.remove(triangle);
-            pointsUtilises.add(point);
+
+            /*TODO(rapport) : On ajoute le point utilisé après le check car dans checkTrianglesValides, on regarde TOUS les triangles,
+                et pas seulement les 3 derniers donc il y avait possibilité pour l'un des triangles qui ne fait pas partie des 3
+                d'avoir le point qu'on vient de rajouter dans son cercle circonscrit et donc on allait basculer des arêtes avant d'avoir
+                basculé les arêtes pour le nouveau point.
+             */
 
             checkTrianglesValides();
+            pointsUtilises.add(point);
+
+            ++nbIterations;
         }
     }
 
     public void checkTrianglesValides() {
+        //TODO(peut-être) : ne parcourir que les 3 derniers triangles ?
         for (Triangle triangle1 : triangles) {
             List<Point> pointsDansCercle = bouleVide(triangle1);
             if (pointsDansCercle.size() > 1) System.out.println("azer");
-            for (Point pointDansCercle : pointsDansCercle) {
-                if (pointDansCercle != null) {
-                    basculerArete(triangle1, pointDansCercle);
+            //for (Point pointDansCercle : pointsDansCercle) {
+                if (!pointsDansCercle.isEmpty()) {
+                    basculerArete(triangle1, pointsDansCercle);
                     checkTrianglesValides();
                     return;
                 }
-            }
+            //}
         }
     }
 
-    public Triangle findTriangleAdjacent(Point point, Triangle triangleCourant) {
+    public Triangle findTriangleAdjacent(List<Point> points, Triangle triangleCourant) {
 
-        for (Triangle triangleAdjacent : triangles) {
-            if (triangleAdjacent.contientPoint(point)) {
-                int cptPoints = 0;
-                if (triangleAdjacent.contientPoint(triangleCourant.p1)) {
-                    ++cptPoints;
-                }
-                if (triangleAdjacent.contientPoint(triangleCourant.p2)) {
-                    ++cptPoints;
-                }
-                if (triangleAdjacent.contientPoint(triangleCourant.p3)) {
-                    ++cptPoints;
-                }
-                if (cptPoints == 2) {
-                    return triangleAdjacent;
+        for (Point point : points) {
+            for (Triangle triangleCandidat : triangles) {
+                if (triangleCandidat.contientPoint(point)) {
+                    int cptPoints = 0;
+                    if (triangleCandidat.contientPoint(triangleCourant.p1)) {
+                        ++cptPoints;
+                    }
+                    if (triangleCandidat.contientPoint(triangleCourant.p2)) {
+                        ++cptPoints;
+                    }
+                    if (triangleCandidat.contientPoint(triangleCourant.p3)) {
+                        ++cptPoints;
+                    }
+                    if (cptPoints == 2) {
+                        pointTriangleAdjacent = point;
+                        return triangleCandidat;
+                    }
                 }
             }
         }
@@ -118,10 +134,10 @@ public class TriangulationDelaunay {
         return null;
     }
 
-    public void basculerArete(Triangle triangleCourant, Point point) {
+    public void basculerArete(Triangle triangleCourant, List<Point> points) {
         //suppr les triangles qui contiennent l'arête à supprimer
         //créer les 2 nouveaux triangles composés de la nouvelle arête
-        Triangle triangleAdjacent = findTriangleAdjacent(point, triangleCourant);
+        Triangle triangleAdjacent = findTriangleAdjacent(points, triangleCourant);
         if (triangleAdjacent == null) {
             System.out.println("Pas de triangle adjacent, pas normal");
         }
@@ -130,20 +146,22 @@ public class TriangulationDelaunay {
             System.out.println("Pas de point différent, pas normal.");
         }
         if (pointDifferent == triangleCourant.p1) {
-            Triangle newTriangle1 = new Triangle(point, pointDifferent, triangleCourant.p2);
-            Triangle newTriangle2 = new Triangle(point, pointDifferent, triangleCourant.p3);
+            Triangle newTriangle1 = new Triangle(pointTriangleAdjacent, pointDifferent, triangleCourant.p2);
+            Triangle newTriangle2 = new Triangle(pointTriangleAdjacent, pointDifferent, triangleCourant.p3);
             triangles.add(newTriangle1);
             triangles.add(newTriangle2);
         } else if (pointDifferent == triangleCourant.p2) {
-            Triangle newTriangle1 = new Triangle(point, pointDifferent, triangleCourant.p1);
-            Triangle newTriangle2 = new Triangle(point, pointDifferent, triangleCourant.p3);
+            Triangle newTriangle1 = new Triangle(pointTriangleAdjacent, pointDifferent, triangleCourant.p1);
+            Triangle newTriangle2 = new Triangle(pointTriangleAdjacent, pointDifferent, triangleCourant.p3);
             triangles.add(newTriangle1);
             triangles.add(newTriangle2);
         } else if (pointDifferent == triangleCourant.p3) {
-            Triangle newTriangle1 = new Triangle(point, pointDifferent, triangleCourant.p1);
-            Triangle newTriangle2 = new Triangle(point, pointDifferent, triangleCourant.p2);
+            Triangle newTriangle1 = new Triangle(pointTriangleAdjacent, pointDifferent, triangleCourant.p1);
+            Triangle newTriangle2 = new Triangle(pointTriangleAdjacent, pointDifferent, triangleCourant.p2);
             triangles.add(newTriangle1);
             triangles.add(newTriangle2);
+        } else {
+            System.out.println("HELP");
         }
         triangles.remove(triangleAdjacent);
         triangles.remove(triangleCourant);
@@ -154,7 +172,6 @@ public class TriangulationDelaunay {
      * @param triangle le triangle pour le quel il faut chercher
      * @return le premier point trouvé à l'intérieur du cercle circonscrit du triangle
      */
-    //TODO : FAUT IL RETURN UNE LISTE DE POINTS AU CAS OU LE CERCLE CONTIENT PLUSIEURS AUTRES POINTS
     public List<Point> bouleVide(Triangle triangle) {
         List<Point> pointsDansCercle = new ArrayList<>();
         for (Point point : pointsUtilises) {
@@ -184,7 +201,7 @@ public class TriangulationDelaunay {
             double c1 = (-a1 * triangle.p1.x) - (b1 * triangle.p1.y);
 
             //si le paramètre point et le troisième point du triangle ne sont pas dans le même demi-plan, on passe au triangle suivant
-            if (!((a1 * x + b1 * y + c1 < 0 && a1 * triangle.p3.x + b1 * triangle.p3.y + c1 < 0) || (a1 * x + b1 * y + c1 > 0 && a1 * triangle.p3.x + b1 * triangle.p3.y + c1 > 0)))
+            if (!((a1 * x + b1 * y + c1 <= 0 && a1 * triangle.p3.x + b1 * triangle.p3.y + c1 <= 0) || (a1 * x + b1 * y + c1 >= 0 && a1 * triangle.p3.x + b1 * triangle.p3.y + c1 >= 0)))
                 continue;
 
             //On répète pour les 2 autres côtés
@@ -192,14 +209,14 @@ public class TriangulationDelaunay {
             double b2 = triangle.p3.x - triangle.p2.x;
             double c2 = (-a2 * triangle.p2.x) - (b2 * triangle.p2.y);
 
-            if (!((a2 * x + b2 * y + c2 < 0 && a2 * triangle.p1.x + b2 * triangle.p1.y + c2 < 0) || (a2 * x + b2 * y + c2 > 0 && a2 * triangle.p1.x + b2 * triangle.p1.y + c2 > 0)))
+            if (!((a2 * x + b2 * y + c2 <= 0 && a2 * triangle.p1.x + b2 * triangle.p1.y + c2 <= 0) || (a2 * x + b2 * y + c2 >= 0 && a2 * triangle.p1.x + b2 * triangle.p1.y + c2 >= 0)))
                 continue;
 
             double a3 = -(triangle.p1.y - triangle.p3.y);
             double b3 = triangle.p1.x - triangle.p3.x;
             double c3 = (-a3 * triangle.p3.x) - (b3 * triangle.p3.y);
 
-            if (!((a3 * x + b3 * y + c3 < 0 && a3 * triangle.p2.x + b3 * triangle.p2.y + c3 < 0) || (a3 * x + b3 * y + c3 > 0 && a3 * triangle.p2.x + b3 * triangle.p2.y + c3 > 0)))
+            if (!((a3 * x + b3 * y + c3 <= 0 && a3 * triangle.p2.x + b3 * triangle.p2.y + c3 <= 0) || (a3 * x + b3 * y + c3 >= 0 && a3 * triangle.p2.x + b3 * triangle.p2.y + c3 >= 0)))
                 continue;
 
             return triangle;
