@@ -61,9 +61,9 @@ public class Interface extends Application {
             /*Triangle triangle = new Triangle(p1, p2, p3);
             double radiusCircle = Math.sqrt(Math.pow(triangle.p1.x - triangle.centre.x, 2) + Math.pow(triangle.p1.y - triangle.centre.y, 2));
             graphicsContext.strokeOval((triangle.centre.x - radiusCircle), (triangle.centre.y - radiusCircle), radiusCircle*2, radiusCircle*2);*/
-
-            TriangulationDelaunay triangulationDelaunay = new TriangulationDelaunay(env);
-            graphicsContext.strokeRect(triangulationDelaunay.rectangle.x, triangulationDelaunay.rectangle.y, triangulationDelaunay.rectangle.width, triangulationDelaunay.rectangle.height);
+            TriangulationSimple triangulationSimple = new TriangulationSimple(env);
+            //TriangulationDelaunay triangulationDelaunay = new TriangulationDelaunay(env);
+            //graphicsContext.strokeRect(triangulationDelaunay.rectangle.x, triangulationDelaunay.rectangle.y, triangulationDelaunay.rectangle.width, triangulationDelaunay.rectangle.height);
             /*for (Triangle triangle : triangulationDelaunay.triangles) {
                 graphicsContext.strokeOval(
                         triangle.centre.x - triangle.rayonCercleCirconscrit,
@@ -72,7 +72,12 @@ public class Interface extends Application {
                         triangle.rayonCercleCirconscrit*2);
             }*/
 
-            for (Triangle triangle : triangulationDelaunay.triangles) {
+            /*for (Triangle triangle : triangulationDelaunay.triangles) {
+                graphicsContext.strokeLine(triangle.p1.x, triangle.p1.y, triangle.p2.x, triangle.p2.y);
+                graphicsContext.strokeLine(triangle.p2.x, triangle.p2.y, triangle.p3.x, triangle.p3.y);
+                graphicsContext.strokeLine(triangle.p1.x, triangle.p1.y, triangle.p3.x, triangle.p3.y);
+            }*/
+            for (Triangle triangle : triangulationSimple.triangles) {
                 graphicsContext.strokeLine(triangle.p1.x, triangle.p1.y, triangle.p2.x, triangle.p2.y);
                 graphicsContext.strokeLine(triangle.p2.x, triangle.p2.y, triangle.p3.x, triangle.p3.y);
                 graphicsContext.strokeLine(triangle.p1.x, triangle.p1.y, triangle.p3.x, triangle.p3.y);
