@@ -1,3 +1,8 @@
+import javafx.scene.Group;
+import javafx.scene.Scene;
+import javafx.scene.canvas.Canvas;
+import javafx.scene.canvas.GraphicsContext;
+
 import java.util.*;
 
 /**
@@ -11,7 +16,7 @@ import java.util.*;
 //https://slideplayer.fr/slide/3701093/
 public class TriangulationDelaunay {
 
-    //Set<Arete> aretes = new HashSet<>();
+    //TODO(bug) : BUG SUR HERMELINE ARRIVE 1 FOIS SUR 5 ENVIRON (FINDTRIANGLEADJACENT RENVOIE NULL)
 
     //tous les triangles actuels de la triangulation qui ne contiennent pas d'autres triangles
     Set<Triangle> triangles = new HashSet<>();
@@ -29,7 +34,14 @@ public class TriangulationDelaunay {
      * @param enveloppeConvexe l'enveloppe convexe sur laquelle on se base
      */
     public TriangulationDelaunay(EnveloppeConvexe enveloppeConvexe) {
-        //initAretes(enveloppeConvexe.enveloppeConvexe);
+        if (enveloppeConvexe.points.size() == 3) {
+            triangles.add(new Triangle(
+                    new Point(enveloppeConvexe.points.get(0).x, enveloppeConvexe.points.get(0).y),
+                    new Point(enveloppeConvexe.points.get(1).x, enveloppeConvexe.points.get(1).y),
+                    new Point(enveloppeConvexe.points.get(2).x, enveloppeConvexe.points.get(2).y)));
+            return;
+        }
+
         for (Point point : enveloppeConvexe.points) {
             pointsRestants.add(point);
         }
@@ -37,10 +49,12 @@ public class TriangulationDelaunay {
         double minY = findMinY(enveloppeConvexe.enveloppeConvexe);
         double maxX = findMaxX(enveloppeConvexe.enveloppeConvexe);
         double maxY = findMaxY(enveloppeConvexe.enveloppeConvexe);
-        double widthRect = (maxX - minX) * 2;
-        double heightRect = (maxY - minY) * 2;
-        double xRect = minX - ((maxX - minX) / 2);
-        double yRect = minY - ((maxY - minY) / 2);
+        double widthRect = (maxX - minX) * 10;
+        double heightRect = (maxY - minY) * 10;
+        //double xRect = (minX - ((maxX - minX) / 2));
+        //double yRect = (minY - ((maxY - minY) / 2));
+        double xRect = minX - (widthRect / 2);
+        double yRect = minY - (heightRect / 2);
         rectangle = new Rectangle(xRect, yRect, widthRect, heightRect);
         Point pointHautGauche = new Point(xRect, yRect);
         Point pointHautDroite = new Point(xRect + widthRect, yRect);
@@ -52,15 +66,22 @@ public class TriangulationDelaunay {
         pointsUtilises.add(pointBasDroite);
         triangles.add(new Triangle(pointHautGauche, pointBasGauche, pointBasDroite));
         triangles.add(new Triangle(pointHautGauche, pointHautDroite, pointBasDroite));
+
         hermeline();
+
+        System.out.println(triangles.size());
         List<Point> pointsRect = new ArrayList<>();
         pointsRect.add(pointHautGauche);
         pointsRect.add(pointBasGauche);
         pointsRect.add(pointHautDroite);
         pointsRect.add(pointBasDroite);
         removeRectangle(pointsRect);
+        System.out.println(triangles.size());
+
         List<Arete> aretes = chercherAretesContour();
-        corrigerEnveloppeConvexe(aretes);
+        if (aretes.size() > 0) {
+            corrigerEnveloppeConvexe(aretes);
+        }
     }
 
     public void corrigerEnveloppeConvexe(List<Arete> aretes) {
@@ -69,11 +90,11 @@ public class TriangulationDelaunay {
         Arete vieilleArete = aretes.get(0);
         Arete nouvelleArete = null;
         Point pointCommun = vieilleArete.point2;
-        boolean signe = true;
+        boolean signe;
         boolean oldSigne = true;
-        boolean pasconvexe =false;
-        List<Point> pointsPasTriangules= new ArrayList<>();
-        while(cptAretes < aretes.size()) {
+        boolean pasconvexe = false;
+        List<Point> pointsPasTriangules = new ArrayList<>();
+        while(cptAretes <= aretes.size()) {
             for (Arete arete: aretes) {
                 if(arete.contientPoint(pointCommun) && arete != vieilleArete){
                     nouvelleArete = arete;
@@ -82,13 +103,18 @@ public class TriangulationDelaunay {
             }
             Vecteur vecteur1 = new Vecteur(pointCommun, vieilleArete.autrePoint(pointCommun));
             Vecteur vecteur2 = new Vecteur(pointCommun, nouvelleArete.autrePoint(pointCommun));
-            if(vecteur1.calculProduitVec(vecteur2)>0) {
+            System.out.println(vecteur1.calculProduitVec(vecteur2));
+            if(vecteur1.calculProduitVec(vecteur2) > 0) {
                 signe = true;
             } else {
                 signe = false;
             }
 
+            if (cptAretes == 0)
+                oldSigne = signe;
+
             if(oldSigne != signe){
+                System.out.println("changement de signe");
                 if(!pasconvexe) {
                     pasconvexe = true;
                     pointsPasTriangules.add(pointCommun);
@@ -96,7 +122,9 @@ public class TriangulationDelaunay {
                     pointsPasTriangules.add(nouvelleArete.autrePoint(pointCommun));
                 }
                 else{
+                    System.out.println("nb points pas triangules : " + pointsPasTriangules.size());
                     EnveloppeConvexe enveloppeConvexe = new EnveloppeConvexe(pointsPasTriangules);
+                    pointsPasTriangules.removeAll(pointsPasTriangules);
                     TriangulationDelaunay triangulationDelaunay = new TriangulationDelaunay(enveloppeConvexe);
                     for (Triangle triangle: triangulationDelaunay.triangles) {
                         triangles.add(triangle);
@@ -104,11 +132,12 @@ public class TriangulationDelaunay {
                     pasconvexe = false;
                 }
             } else {
-                oldSigne = signe;
+
                 if(pasconvexe){
                     pointsPasTriangules.add(nouvelleArete.autrePoint(pointCommun));
                 }
             }
+            oldSigne = signe;
             ++cptAretes;
             vieilleArete = nouvelleArete;
             pointCommun = vieilleArete.autrePoint(pointCommun);
@@ -182,7 +211,7 @@ public class TriangulationDelaunay {
     }
 
     public Triangle findTriangleAdjacent(List<Point> points, Triangle triangleCourant) {
-
+        System.out.println("nb triangles : " + triangles.size());
         for (Point point : points) {
             for (Triangle triangleCandidat : triangles) {
                 if (triangleCandidat.contientPoint(point)) {
@@ -269,8 +298,8 @@ public class TriangulationDelaunay {
     private void removeRectangle(List<Point> pointsRectangle){
         List<Triangle> trianglesASuppr = new ArrayList<>();
         for (Triangle triangle: triangles) {
-            for (Point point: pointsRectangle) {
-                if(triangle.contientPoint(point)) {
+            for (Point pointRectangle: pointsRectangle) {
+                if(triangle.contientPoint(pointRectangle)) {
                     trianglesASuppr.add(triangle);
                     break;
                 }

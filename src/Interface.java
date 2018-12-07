@@ -19,7 +19,7 @@ public class Interface extends Application {
         }
 
         public List<Point> randomPoints() {
-            int nbSommets = ThreadLocalRandom.current().nextInt(15, 20);
+            int nbSommets = ThreadLocalRandom.current().nextInt(50, 60);
             List<Point> points = new ArrayList<>(nbSommets);
             for(int i = 0 ; i < nbSommets ; ++i) {
                 int x = ThreadLocalRandom.current().nextInt(255, 745);
@@ -37,6 +37,15 @@ public class Interface extends Application {
             List<Point2D> points = new ArrayList<>();
 
             List<Point> pointsE = randomPoints();
+            //List<Point> pointsE = new ArrayList<>();
+            //pointsE.add(new Point(300,350));
+            //pointsE.add(new Point(350,450));
+            //pointsE.add(new Point(650,250));
+            //pointsE.add(new Point(550,350));
+            //pointsE.add(new Point(400,300));
+            //pointsE.add(new Point(650,550));
+            //pointsE.add(new Point(450,600));
+            //pointsE.add(new Point(600,650));
             EnveloppeConvexe env = new EnveloppeConvexe(pointsE);
             for (Point point: pointsE) {
                 points.add(new Point2D(point.x,point.y));
@@ -46,24 +55,8 @@ public class Interface extends Application {
                 graphicsContext.strokeOval(point.getX(),point.getY(),radius*2,radius*2);
             }
 
-            /*for (int i = 0; i < env.enveloppeConvexe.size()-1 ; ++i) {
-                graphicsContext.strokeLine(
-                        env.enveloppeConvexe.get(i).x + radius,
-                        env.enveloppeConvexe.get(i).y + radius,
-                        env.enveloppeConvexe.get(i+1).x + radius,
-                        env.enveloppeConvexe.get(i+1).y + radius);
-            }
-            graphicsContext.strokeLine(
-                    env.enveloppeConvexe.get(0).x + radius,
-                    env.enveloppeConvexe.get(0).y + radius,
-                    env.enveloppeConvexe.get(env.enveloppeConvexe.size()-1).x + radius,
-                    env.enveloppeConvexe.get(env.enveloppeConvexe.size()-1).y + radius);*/
-            /*Triangle triangle = new Triangle(p1, p2, p3);
-            double radiusCircle = Math.sqrt(Math.pow(triangle.p1.x - triangle.centre.x, 2) + Math.pow(triangle.p1.y - triangle.centre.y, 2));
-            graphicsContext.strokeOval((triangle.centre.x - radiusCircle), (triangle.centre.y - radiusCircle), radiusCircle*2, radiusCircle*2);*/
-            TriangulationSimple triangulationSimple = new TriangulationSimple(env);
-            //TriangulationDelaunay triangulationDelaunay = new TriangulationDelaunay(env);
-            //graphicsContext.strokeRect(triangulationDelaunay.rectangle.x, triangulationDelaunay.rectangle.y, triangulationDelaunay.rectangle.width, triangulationDelaunay.rectangle.height);
+            TriangulationDelaunay triangulationDelaunay = new TriangulationDelaunay(env);
+            graphicsContext.strokeRect(triangulationDelaunay.rectangle.x, triangulationDelaunay.rectangle.y, triangulationDelaunay.rectangle.width, triangulationDelaunay.rectangle.height);
             /*for (Triangle triangle : triangulationDelaunay.triangles) {
                 graphicsContext.strokeOval(
                         triangle.centre.x - triangle.rayonCercleCirconscrit,
@@ -72,15 +65,10 @@ public class Interface extends Application {
                         triangle.rayonCercleCirconscrit*2);
             }*/
 
-            /*for (Triangle triangle : triangulationDelaunay.triangles) {
-                graphicsContext.strokeLine(triangle.p1.x, triangle.p1.y, triangle.p2.x, triangle.p2.y);
-                graphicsContext.strokeLine(triangle.p2.x, triangle.p2.y, triangle.p3.x, triangle.p3.y);
-                graphicsContext.strokeLine(triangle.p1.x, triangle.p1.y, triangle.p3.x, triangle.p3.y);
-            }*/
-            for (Triangle triangle : triangulationSimple.triangles) {
-                graphicsContext.strokeLine(triangle.p1.x, triangle.p1.y, triangle.p2.x, triangle.p2.y);
-                graphicsContext.strokeLine(triangle.p2.x, triangle.p2.y, triangle.p3.x, triangle.p3.y);
-                graphicsContext.strokeLine(triangle.p1.x, triangle.p1.y, triangle.p3.x, triangle.p3.y);
+            for (Triangle triangle : triangulationDelaunay.triangles) {
+                graphicsContext.strokeLine(triangle.p1.x + radius, triangle.p1.y + radius, triangle.p2.x + radius, triangle.p2.y + radius);
+                graphicsContext.strokeLine(triangle.p2.x + radius, triangle.p2.y + radius, triangle.p3.x + radius, triangle.p3.y + radius);
+                graphicsContext.strokeLine(triangle.p1.x + radius, triangle.p1.y + radius, triangle.p3.x + radius, triangle.p3.y + radius);
             }
 
             root.getChildren().add(canvas);
