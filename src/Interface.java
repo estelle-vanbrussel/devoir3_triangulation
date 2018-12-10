@@ -22,8 +22,8 @@ public class Interface extends Application {
             int nbSommets = ThreadLocalRandom.current().nextInt(50, 60);
             List<Point> points = new ArrayList<>(nbSommets);
             for(int i = 0 ; i < nbSommets ; ++i) {
-                int x = ThreadLocalRandom.current().nextInt(255, 745);
-                int y = ThreadLocalRandom.current().nextInt(255, 745);
+                int x = ThreadLocalRandom.current().nextInt(1, 1000);
+                int y = ThreadLocalRandom.current().nextInt(1, 1000);
                 points.add(new Point(x,y));
             }
             return points;
@@ -37,12 +37,17 @@ public class Interface extends Application {
             List<Point2D> points = new ArrayList<>();
 
             List<Point> pointsE = randomPoints();
+            /*for (Point point : pointsE) {
+                System.out.println(point.x);
+                System.out.println(point.y);
+                System.out.println("");
+            }*/
             //List<Point> pointsE = new ArrayList<>();
-            //pointsE.add(new Point(300,350));
-            //pointsE.add(new Point(350,450));
-            //pointsE.add(new Point(650,250));
-            //pointsE.add(new Point(550,350));
-            //pointsE.add(new Point(400,300));
+            //pointsE.add(new Point(676,195));
+            //pointsE.add(new Point(371,294));
+            //pointsE.add(new Point(974,879));
+            //pointsE.add(new Point(417,338));
+            //pointsE.add(new Point(230,97));
             //pointsE.add(new Point(650,550));
             //pointsE.add(new Point(450,600));
             //pointsE.add(new Point(600,650));
@@ -54,7 +59,6 @@ public class Interface extends Application {
             for (Point2D point:  points) {
                 graphicsContext.strokeOval(point.getX(),point.getY(),radius*2,radius*2);
             }
-
             TriangulationDelaunay triangulationDelaunay = new TriangulationDelaunay(env);
             graphicsContext.strokeRect(triangulationDelaunay.rectangle.x, triangulationDelaunay.rectangle.y, triangulationDelaunay.rectangle.width, triangulationDelaunay.rectangle.height);
             /*for (Triangle triangle : triangulationDelaunay.triangles) {
@@ -65,6 +69,9 @@ public class Interface extends Application {
                         triangle.rayonCercleCirconscrit*2);
             }*/
 
+
+            //TriangulationSimple triangulationSimple = new TriangulationSimple(env);
+
             for (Triangle triangle : triangulationDelaunay.triangles) {
                 graphicsContext.strokeLine(triangle.p1.x + radius, triangle.p1.y + radius, triangle.p2.x + radius, triangle.p2.y + radius);
                 graphicsContext.strokeLine(triangle.p2.x + radius, triangle.p2.y + radius, triangle.p3.x + radius, triangle.p3.y + radius);
@@ -74,5 +81,6 @@ public class Interface extends Application {
             root.getChildren().add(canvas);
             primaryStage.setScene(new Scene(root));
             primaryStage.show();
+
         }
     }

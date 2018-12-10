@@ -49,8 +49,8 @@ public class TriangulationDelaunay {
         double minY = findMinY(enveloppeConvexe.enveloppeConvexe);
         double maxX = findMaxX(enveloppeConvexe.enveloppeConvexe);
         double maxY = findMaxY(enveloppeConvexe.enveloppeConvexe);
-        double widthRect = (maxX - minX) * 10;
-        double heightRect = (maxY - minY) * 10;
+        double widthRect = (maxX - minX) * 100;
+        double heightRect = (maxY - minY) * 100;
         //double xRect = (minX - ((maxX - minX) / 2));
         //double yRect = (minY - ((maxY - minY) / 2));
         double xRect = minX - (widthRect / 2);
@@ -68,7 +68,6 @@ public class TriangulationDelaunay {
         triangles.add(new Triangle(pointHautGauche, pointHautDroite, pointBasDroite));
 
         hermeline();
-
         System.out.println(triangles.size());
         List<Point> pointsRect = new ArrayList<>();
         pointsRect.add(pointHautGauche);
