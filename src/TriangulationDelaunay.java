@@ -1,22 +1,10 @@
-import javafx.scene.Group;
-import javafx.scene.Scene;
-import javafx.scene.canvas.Canvas;
-import javafx.scene.canvas.GraphicsContext;
-
 import java.util.*;
 
 /**
  * Created by Vincent on 01/12/2018.
  */
 
-//https://slideplayer.fr/slide/3701093/
-//https://slideplayer.fr/slide/3701093/
-//https://slideplayer.fr/slide/3701093/
-//https://slideplayer.fr/slide/3701093/
-//https://slideplayer.fr/slide/3701093/
 public class TriangulationDelaunay {
-
-    //TODO(bug) : BUG SUR HERMELINE ARRIVE 1 FOIS SUR 5 ENVIRON (FINDTRIANGLEADJACENT RENVOIE NULL)
 
     //tous les triangles actuels de la triangulation qui ne contiennent pas d'autres triangles
     Set<Triangle> triangles = new HashSet<>();
@@ -68,14 +56,13 @@ public class TriangulationDelaunay {
         triangles.add(new Triangle(pointHautGauche, pointHautDroite, pointBasDroite));
 
         hermeline();
-        System.out.println(triangles.size());
+
         List<Point> pointsRect = new ArrayList<>();
         pointsRect.add(pointHautGauche);
         pointsRect.add(pointBasGauche);
         pointsRect.add(pointHautDroite);
         pointsRect.add(pointBasDroite);
         removeRectangle(pointsRect);
-        System.out.println(triangles.size());
 
         List<Arete> aretes = chercherAretesContour();
         if (aretes.size() > 0) {
@@ -102,7 +89,6 @@ public class TriangulationDelaunay {
             }
             Vecteur vecteur1 = new Vecteur(pointCommun, vieilleArete.autrePoint(pointCommun));
             Vecteur vecteur2 = new Vecteur(pointCommun, nouvelleArete.autrePoint(pointCommun));
-            System.out.println(vecteur1.calculProduitVec(vecteur2));
             if(vecteur1.calculProduitVec(vecteur2) > 0) {
                 signe = true;
             } else {
@@ -113,7 +99,6 @@ public class TriangulationDelaunay {
                 oldSigne = signe;
 
             if(oldSigne != signe){
-                System.out.println("changement de signe");
                 if(!pasconvexe) {
                     pasconvexe = true;
                     pointsPasTriangules.add(pointCommun);
@@ -121,7 +106,6 @@ public class TriangulationDelaunay {
                     pointsPasTriangules.add(nouvelleArete.autrePoint(pointCommun));
                 }
                 else{
-                    System.out.println("nb points pas triangules : " + pointsPasTriangules.size());
                     EnveloppeConvexe enveloppeConvexe = new EnveloppeConvexe(pointsPasTriangules);
                     pointsPasTriangules.removeAll(pointsPasTriangules);
                     TriangulationDelaunay triangulationDelaunay = new TriangulationDelaunay(enveloppeConvexe);
@@ -182,12 +166,6 @@ public class TriangulationDelaunay {
             triangles.add(new Triangle(triangle.p3, triangle.p1, point));
             triangles.remove(triangle);
 
-            /*TODO(rapport) : On ajoute le point utilisé après le check car dans checkTrianglesValides, on regarde TOUS les triangles,
-                et pas seulement les 3 derniers donc il y avait possibilité pour l'un des triangles qui ne fait pas partie des 3
-                d'avoir le point qu'on vient de rajouter dans son cercle circonscrit et donc on allait basculer des arêtes avant d'avoir
-                basculé les arêtes pour le nouveau point.
-             */
-
             checkTrianglesValides();
             pointsUtilises.add(point);
 
@@ -196,21 +174,17 @@ public class TriangulationDelaunay {
     }
 
     public void checkTrianglesValides() {
-        //TODO(peut-être) : ne parcourir que les 3 derniers triangles ?
         for (Triangle triangle1 : triangles) {
             List<Point> pointsDansCercle = bouleVide(triangle1);
-            //for (Point pointDansCercle : pointsDansCercle) {
-                if (!pointsDansCercle.isEmpty()) {
-                    basculerArete(triangle1, pointsDansCercle);
-                    checkTrianglesValides();
-                    return;
-                }
-            //}
+            if (!pointsDansCercle.isEmpty()) {
+                basculerArete(triangle1, pointsDansCercle);
+                checkTrianglesValides();
+                return;
+            }
         }
     }
 
     public Triangle findTriangleAdjacent(List<Point> points, Triangle triangleCourant) {
-        System.out.println("nb triangles : " + triangles.size());
         for (Point point : points) {
             for (Triangle triangleCandidat : triangles) {
                 if (triangleCandidat.contientPoint(point)) {

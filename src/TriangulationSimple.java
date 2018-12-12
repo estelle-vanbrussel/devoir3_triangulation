@@ -28,7 +28,6 @@ public class TriangulationSimple {
         }
         triangles.add(new Triangle(enveloppeConvexe.enveloppeConvexe.get(enveloppeConvexe.enveloppeConvexe.size()-1),enveloppeConvexe.enveloppeConvexe.get(0),pointAAjouter));
         pointsUtilises.add(pointAAjouter);
-        int nbIterations = 0;
         while(!pointsRestants.isEmpty()) {
             Point point = pointsRestants.poll();
             Triangle triangle = findTriangleContainingPoint(point);
@@ -39,8 +38,6 @@ public class TriangulationSimple {
             triangles.remove(triangle);
 
             pointsUtilises.add(point);
-
-            ++nbIterations;
         }
     }
 
